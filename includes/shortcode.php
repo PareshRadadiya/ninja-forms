@@ -106,8 +106,9 @@ function nf_all_fields_shortcode( $atts, $content = '' ) {
 		return false;
 
 	$atts = shortcode_atts( array(
-		'html'         => 1,
-		'show_empty_fields' => 'false'
+		'html'          => 1,
+		'show_empty'    => 'false',
+		'show_hidden'   => 'true',
 	), $atts, 'ninja_forms_all_fields' );
 
 	if ( 1 == $atts['html'] ) {
@@ -119,12 +120,14 @@ function nf_all_fields_shortcode( $atts, $content = '' ) {
 	foreach ( $ninja_forms_processing->get_all_fields() as $field_id => $user_value ) {
 
 
-		if ( 'false' === $atts['show_empty_fields'] && ! $user_value )
+		if ( 'false' === $atts['show_empty'] && ! $user_value )
 			continue;
 
 		$field = $ninja_forms_processing->get_field_settings( $field_id );
 		$type = $field['type'];
-		if ( ! isset ( $ninja_forms_fields[ $type ] ) || ! $ninja_forms_fields[ $type ]['process_field'] )
+		if ( ( '_hidden' === $type && 'false' === $atts['show_hidden'] )
+			|| ! isset ( $ninja_forms_fields[ $type ] )
+			|| ! $ninja_forms_fields[ $type ]['process_field'] )
 			continue;
 
 		$value = apply_filters( 'nf_all_fields_field_value', ninja_forms_field_shortcode( array( 'id' => $field_id ) ), $field_id );
